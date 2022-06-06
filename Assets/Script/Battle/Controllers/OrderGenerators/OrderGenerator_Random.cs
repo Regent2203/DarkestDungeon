@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DarkestDungeon.Battle.TurnControllers
+namespace DarkestDungeon.Battle.OrderGenerators
 {
-    public class OrderTool_Random : IOrderTool
+    /// <summary>
+    /// Order will be completely random.
+    /// </summary>
+    public class OrderGenerator_Random : IOrderGenerator
     {
         public Queue<int> GenerateOrder(List<Character> allCharacters)
         {            

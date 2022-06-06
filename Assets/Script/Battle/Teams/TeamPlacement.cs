@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 namespace DarkestDungeon.Battle
 {
+    /// <summary>
+    /// Use two Transforms (gameobjects) on scene to define a line which will be used to place team's characters on.
+    /// </summary>
     public class TeamPlacement : MonoBehaviour
     {
         //for rightTeam, we mirrorX the characters (so that both teams look at each other/at center)

@@ -10,13 +10,13 @@ namespace DarkestDungeon.Battle.BattleActions
     [Serializable]
     public class BattleAction_Attack : BattleAction
     {
-        protected int _damage;
-        //protected int _damage => _owner._attackPower * 2; //todo rework if we wanna use character's attackpower with dynamic update
+        protected int _damage; //todo
+        //protected int _damage => _owner._attackPower * 2; //todo rework if we wanna use character's attackpower (dynamically updated)
 
-        private TargetController _targetController;
+        private TargetController<Character> _targetController;
 
 
-        public BattleAction_Attack(string name, Character owner, TargetController targetController, int damage) : base (name, owner)
+        public BattleAction_Attack(string name, Character owner, TargetController<Character> targetController, int damage) : base (name, owner)
         {
             _damage = damage;
             _targetController = targetController;
@@ -24,10 +24,10 @@ namespace DarkestDungeon.Battle.BattleActions
         
         public override void OnButtonClick()
         {
-            _targetController.Prepare( (x) => _owner.Team != x.Team, StartAnim);
+            _targetController.Prepare( (x) => _owner.Team != x.Team, StartAnimation);
 
 
-            void StartAnim(Character target)
+            void StartAnimation(Character target)
             {
                 HideButtons();
 
@@ -43,8 +43,7 @@ namespace DarkestDungeon.Battle.BattleActions
 
                 void OnAnimCompleteTarget(TrackEntry trackEntry)
                 {
-                    target.PlayAnimation("Idle", true); //todo: fix hardcode (animation name)
-                    Complete();
+                    target.PlayAnimation("Idle", true); //todo: fix hardcode (animation name)                    
                 }
             }
         }

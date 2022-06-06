@@ -14,7 +14,6 @@ namespace DarkestDungeon.UI
         [SerializeField]
         private Transform _battleActionButtonsHolder = default;
 
-
         private List<Button_BattleAction> _battleActionButtons = new List<Button_BattleAction>();
 
 
@@ -38,7 +37,7 @@ namespace DarkestDungeon.UI
                 btnBA.Init(ba.Name, () => { ba.OnButtonClick(); });
 
                 ba.OnHideButtons += HideButtons;
-                ba.OnActionCompleted += ActionCompleted;                
+                ba.OnActionCompleted += ActionCompleted;
                 
 
                 void HideButtons()

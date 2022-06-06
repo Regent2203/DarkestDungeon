@@ -1,10 +1,11 @@
 ﻿using DarkestDungeon.Battle.Characters;
+using DarkestDungeon.Battle.OrderGenerators;
 using DarkestDungeon.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DarkestDungeon.Battle.TurnControllers
+namespace DarkestDungeon.Battle
 {
     /// <summary>
     /// Controls activity of characters by generated turn order
@@ -12,22 +13,18 @@ namespace DarkestDungeon.Battle.TurnControllers
     public class TurnController
     {
         private int _currentTurn;
-        private List<Character> _allCharacters = new List<Character>();
-
-        private bool _doRefreshOrder = false;
         private Queue<int> _order;
-        private Queue<int> _orderCopy;
-        private IOrderTool _orderTool; //todo: may be replaced during same battle in corresponding situations/conditions
-
+        private List<Character> _allCharacters = new List<Character>();
+                
+        private OrderController _orderController;
         //private IBattleLogger _battleLogger;
         private BattleUI _battleUI;
 
 
-        public TurnController(BattleUI battleUI, IOrderTool orderTool, bool doRefreshOrder)
+        public TurnController(BattleUI battleUI, IOrderGenerator orderGenerator, bool doRefreshOrder)
         {
-            _orderTool = orderTool;
-            _doRefreshOrder = doRefreshOrder;
             _battleUI = battleUI;
+            _orderController = new OrderController(orderGenerator, doRefreshOrder, _allCharacters);
         }
 
         public void FillCharacters(List<Character> list)
@@ -35,37 +32,19 @@ namespace DarkestDungeon.Battle.TurnControllers
             _allCharacters.AddRange(list);
         }
 
-        private Queue<int> GetOrder()
-        {            
-            if (_doRefreshOrder)
-            {
-                return _orderTool.GenerateOrder(_allCharacters);
-            }                
-            else
-            {
-                if (_orderCopy == null)
-                {
-                    _orderCopy = _orderTool.GenerateOrder(_allCharacters);
-                }
-                return new Queue<int>(_orderCopy);
-            }                
-        }
-
 
         public void StartBattle()
         {
             Debug.Log($"Battle started.");
             _currentTurn = 0;
-            if (!_doRefreshOrder)
-                _order = _orderTool.GenerateOrder(_allCharacters);
-
+            
             NextTurn();
         }
 
-        public void NextTurn()
+        private void NextTurn()
         {
             _currentTurn++;
-            _order = GetOrder();
+            _order = _orderController.GetOrder();
 
             Debug.Log($"New turn {_currentTurn}.");
             ActivateNextCharacter();
@@ -91,7 +70,7 @@ namespace DarkestDungeon.Battle.TurnControllers
         }
        
 
-        public void CompleteTurn()
+        private void CompleteTurn()
         {
             Debug.Log($"End of turn {_currentTurn}.");            
             NextTurn();

@@ -1,14 +1,13 @@
 ﻿using DarkestDungeon.Battle.Characters;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace DarkestDungeon.Battle.TurnControllers
+namespace DarkestDungeon.Battle.OrderGenerators
 {
     /// <summary>
     /// Defines in which order characters in battle perform actions (one after another)
     /// </summary>
-    public interface IOrderTool
+    public interface IOrderGenerator
     {
         Queue<int> GenerateOrder(List<Character> allCharacters);
     }

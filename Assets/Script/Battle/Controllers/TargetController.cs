@@ -1,21 +1,18 @@
 ﻿using DarkestDungeon.Battle.Characters;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace DarkestDungeon.Battle
 {
     /// <summary>
     /// Works with characters which we mouseover/click on, can highlight or set as confirmed target for battle action
     /// </summary>
-    public class TargetController
+    public class TargetController<T>
     {
-        private Predicate<Character> _condition;
-        private Action<Character> _onConfirmTarget;
+        private Predicate<T> _condition;
+        private Action<T> _onConfirmTarget;
 
 
-        public void Prepare(Predicate<Character> predicate, Action<Character> onConfirmTarget)
+        public void Prepare(Predicate<T> predicate, Action<T> onConfirmTarget)
         {
             _condition = predicate;
             _onConfirmTarget = onConfirmTarget;
@@ -26,7 +23,7 @@ namespace DarkestDungeon.Battle
             _onConfirmTarget = null;
         }
 
-        public void CheckTarget(Character target, Action onSuccess)
+        public void CheckTarget(T target, Action onSuccess)
         {
             if (_condition == null)
                 return;
@@ -35,7 +32,7 @@ namespace DarkestDungeon.Battle
                 onSuccess();
         }
 
-        public void ConfirmTarget(Character target, Action onSuccess)
+        public void ConfirmTarget(T target, Action onSuccess)
         {
             if (_condition == null)
                 return;

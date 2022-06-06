@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using DarkestDungeon.Configs;
-using DarkestDungeon.Battle.TurnControllers;
 using DarkestDungeon.Battle.Characters;
 using System.Linq;
 
@@ -26,16 +25,12 @@ namespace DarkestDungeon.Battle
 
         private List<Character> _characters;
         public int Count => _characterIds.Count;
-        public bool IsDefeated => (from v in _characters select v.IsAlive).Count() == 0;
+        //public bool IsDefeated => (from v in _characters select v.IsAlive).Count() == 0;
 
 
-        public Team()
-        {
+        public void CreateCharacters(CharacterConfig _characterConfig, IEnumerator<Vector3> positions, TeamPlacement teamPlacement, TurnController turnController, TargetController<Character> targetController)
+        {            
             _characters = new List<Character>(_characterIds.Count);
-        }
-        
-        public void CreateCharacters(CharacterConfig _characterConfig, IEnumerator<Vector3> positions, TeamPlacement teamPlacement, TurnController turnController, TargetController targetController)
-        {
             int i = 0;
 
             foreach (int id in _characterIds)

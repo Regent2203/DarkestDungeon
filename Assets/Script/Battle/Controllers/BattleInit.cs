@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using DarkestDungeon.Configs;
 using DarkestDungeon.UI;
-using DarkestDungeon.Battle.TurnControllers;
+using DarkestDungeon.Battle.OrderGenerators;
+using DarkestDungeon.Battle.Characters;
 
 namespace DarkestDungeon.Battle
 {
@@ -30,7 +29,7 @@ namespace DarkestDungeon.Battle
         private TeamPlacement _rightTeamPlacement = default;
 
         private TurnController _turnController;
-        private TargetController _targetController;
+        private TargetController<Character> _targetController;
 
 
         void Start()
@@ -51,8 +50,8 @@ namespace DarkestDungeon.Battle
         private void CreateControllers()
         {
             //_turnController = new TurnController(_battleUI, new OrderTool_Left2Right(), false);
-            _turnController = new TurnController(_battleUI, new OrderTool_Random(), false); //in test task - acting order must be random
-            _targetController = new TargetController();
+            _turnController = new TurnController(_battleUI, new OrderGenerator_Random(), false); //in test task - acting order must be random
+            _targetController = new TargetController<Character>();
         }
 
         private void CreateCharacters()

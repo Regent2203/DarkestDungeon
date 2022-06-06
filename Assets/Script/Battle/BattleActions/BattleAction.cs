@@ -32,7 +32,7 @@ namespace DarkestDungeon.Battle.BattleActions
 
         protected void Complete()
         {
-            Debug.Log($"{Name} completed ({_owner.name}).", _owner);
+            Debug.Log($"--{Name} completed by {_owner.name}.", _owner);
             OnActionCompleted?.Invoke();
         }
     }

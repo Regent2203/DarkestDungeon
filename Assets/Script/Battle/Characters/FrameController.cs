@@ -41,12 +41,12 @@ namespace DarkestDungeon.Battle.Characters
             frame.transform.localPosition = (Vector3)_frameCollider.offset;
         }
 
-        public void HighlightCurrentTurn(bool b)
+        public void HighlightCurrentTurn(bool b) //highlight acting character
         {
             if (_frameCurrentTurn.enabled != b)
                 _frameCurrentTurn.enabled = b;
         }
-        public void HighlightAllowedTarget(bool b)
+        public void HighlightAllowedTarget(bool b) //highlight on mouseover
         {
             if (_frameAllowedTarget.enabled != b)
                 _frameAllowedTarget.enabled = b;

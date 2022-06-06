@@ -19,7 +19,7 @@ namespace DarkestDungeon.Battle.Characters
         private FrameController _frameController = default;
 
         private List<BattleAction> _battleActions = new List<BattleAction>();
-        private TargetController _targetController;
+        private TargetController<Character> _targetController;
         private MeshRenderer _meshRenderer;
         private SkeletonAnimation _skelAnim;
         public Team Team { get; protected set; }
@@ -27,13 +27,14 @@ namespace DarkestDungeon.Battle.Characters
 
         //todo parameters later
         //public Parameters Parameters { get; protected set; }
-        int _health = 100;
+        //int _health = 100;
         //int _mana = 0;
         //int _attackPower;
         //int _armor;
 
-        public bool IsDead => _health <= 0;
-        public bool IsAlive => _health > 0;
+        //public bool IsDead => _health <= 0;
+        //public bool IsAlive => _health > 0;
+        public bool IsAlive => true; //todo, remove later
 
 
         private void Awake()
@@ -42,7 +43,7 @@ namespace DarkestDungeon.Battle.Characters
             _meshRenderer = GetComponent<MeshRenderer>();
         }
 
-        public void Init(int number, Team team, TargetController targetController, bool doMirror)
+        public void Init(int number, Team team, TargetController<Character> targetController, bool doMirror)
         {
             name += $"_{number:00}"; //for small amounts of concatinations, StringBuilder is not better.
             _meshRenderer.sortingOrder += number;
@@ -60,7 +61,6 @@ namespace DarkestDungeon.Battle.Characters
             _battleActions.Add(new BattleAction_SkipTurn("Skip turn", this));
             _battleActions.Add(new BattleAction_Attack("Attack", this, _targetController, 20));
         }
-
         
         public void ActivateForBattle(BattleUI battleUI, Action onActionCompleted)
         {
@@ -73,14 +73,17 @@ namespace DarkestDungeon.Battle.Characters
                 _frameController.HighlightCurrentTurn(false);
             }
         }
-        
+
+        #region 'Animations-related' //todo: move?
         public void PlayAnimation(string animationName, bool loop = false, float timeScale = 1.0f)
         {
+            _skelAnim.ClearState();
             //_skelAnim.AnimationName = animationName;
             //_skelAnim.loop = loop;
             _skelAnim.timeScale = timeScale;            
-            _skelAnim.AnimationState.SetAnimation(0, animationName, loop);
+            _skelAnim.AnimationState.SetAnimation(0, animationName, loop);            
         }
+
         public void PlayAnimation(AnimationState.TrackEntryDelegate onAnimComplete, string animationName, bool loop = false, float timeScale = 1.0f)
         {
             PlayAnimation(animationName, loop, timeScale);
@@ -92,19 +95,22 @@ namespace DarkestDungeon.Battle.Characters
                 _skelAnim.AnimationState.Complete -= OnComplete;
             }
         }
+
         public void PlayAnimationWithTarget(Character target, AnimationState.TrackEntryDelegate onAnimComplete, string animationName, bool loop = false, float timeScale = 1.0f)
         {
-            const float OFFSET = 4; //todo: expand this method for more types of skills and animations (fine for test task)
+            //todo: expand this method for more types of skills and animations (fine for test task)
+            const float OFFSET = 4; 
             const int TOFRONTTHIS = 1010; //bring both characters to front
             const int TOFRONTTARG = 1000;
-
-            
+                        
             var startPos = this.transform.position;
             var newPos = target.transform.position + target.transform.localScale.x * OFFSET * new Vector3( 1, 0, 0);
+
             //teleport character to new pos
             this.AddOrderInLayer(TOFRONTTHIS);
             target.AddOrderInLayer(TOFRONTTARG);
             this.transform.position = newPos;
+
 
             PlayAnimation(OnComplete, animationName, loop, timeScale);
             
@@ -124,7 +130,8 @@ namespace DarkestDungeon.Battle.Characters
         {
             _meshRenderer.sortingOrder += z;
         }
-
+        #endregion
+        #region 'Mouse+Trigger related'
         private void OnMouseDown()
         {
             _targetController.ConfirmTarget(this, onSuccess);
@@ -149,5 +156,6 @@ namespace DarkestDungeon.Battle.Characters
         {            
             _frameController.HighlightAllowedTarget(false);
         }
+        #endregion
     }
 }
