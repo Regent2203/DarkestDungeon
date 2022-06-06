@@ -14,19 +14,7 @@ namespace DarkestDungeon.Configs
     {
         [SerializeField]
         private List<CharacterLine> _characters = new List<CharacterLine>();
-                
-
-        [MenuItem("Assets/Create/DarkestDungeon/CharacterConfig")]
-        static void CreateAsset()
-        {            
-            var asset = CreateInstance<CharacterConfig>();
-            
-            AssetDatabase.CreateAsset(asset, "Assets/Configs/CharacterConfig.asset");
-            AssetDatabase.SaveAssets();
-
-            EditorUtility.FocusProjectWindow();
-            Selection.activeObject = asset;
-        }
+        
 
         public CharacterLine FindCharacterById(int id)
         {
