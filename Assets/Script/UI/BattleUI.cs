@@ -14,11 +14,10 @@ namespace DarkestDungeon.UI
         [SerializeField]
         private Transform _battleActionButtonsHolder = default;
 
-        private List<Button_BattleAction> _battleActionButtons = new List<Button_BattleAction>();
+        private List<Button_BattleAction> _battleActionButtons = new List<Button_BattleAction>(); //object pool for UI buttons
 
 
-
-        public void CreateButtonsForBattleActions(List<BattleAction> battleActions, Action onActionCompleted, Action onHideButtons)
+        public void CreateButtonsForBattleActions(List<BattleAction> battleActions, Action onActionConfirmed, Action onActionCompleted)
         {
             for (int i = 0; i < battleActions.Count; i++)
             {
@@ -33,45 +32,17 @@ namespace DarkestDungeon.UI
                     _battleActionButtons.Add(btnBA);
                 }
 
-                var ba = battleActions[i];
-                btnBA.Init(ba.Name, () => { ba.OnButtonClick(); });
 
-                ba.OnHideButtons += HideButtons;
-                ba.OnActionCompleted += ActionCompleted;
-                
-
-                void HideButtons()
-                {
-                    onHideButtons();
-                    ResetButtonsForBattleActions(battleActions, HideButtons);
-                }
-
-                void ActionCompleted()
-                {
-                    ResetBattleActions(battleActions, ActionCompleted);
-                    onActionCompleted();
-                }
+                var battleAction = battleActions[i];
+                btnBA.Init(battleAction.Name, () => { battleAction.OnButtonClick(); });
+                battleAction.SetListeners(onActionConfirmed, onActionCompleted);
             }
         }
 
-        private void ResetButtonsForBattleActions(List<BattleAction> battleActions, Action onHideButtons)
-        {
-            foreach (var ba in battleActions)
-                ba.OnHideButtons -= onHideButtons;
-            
+        public void ResetButtonsForBattleActions()
+        {            
             foreach (var btnBA in _battleActionButtons)
                 btnBA.Reset();
-        }
-        private void ResetBattleActions(List<BattleAction> battleActions, Action onActionCompleted)
-        {
-            foreach (var ba in battleActions)
-                ba.OnActionCompleted -= onActionCompleted;
-        }
-
-
-        public void CreateStatsPanel()
-        {
-            //todo
         }
     }
 }

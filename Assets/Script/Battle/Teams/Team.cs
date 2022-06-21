@@ -5,6 +5,7 @@ using System;
 using DarkestDungeon.Configs;
 using DarkestDungeon.Battle.Characters;
 using System.Linq;
+using DarkestDungeon.Battle.BattleLoggers;
 
 namespace DarkestDungeon.Battle
 {
@@ -24,13 +25,13 @@ namespace DarkestDungeon.Battle
         private List<int> _characterIds = new List<int>();
 
         private List<Character> _characters;
-        public int Count => _characterIds.Count;
         //public bool IsDefeated => (from v in _characters select v.IsAlive).Count() == 0;
 
 
-        public void CreateCharacters(CharacterConfig _characterConfig, IEnumerator<Vector3> positions, TeamPlacement teamPlacement, TurnController turnController, TargetController<Character> targetController)
+        public List<Character> InstantiateCharacters(CharacterConfig _characterConfig, TeamPlacement teamPlacement, BattleView battleView)
         {            
-            _characters = new List<Character>(_characterIds.Count);
+            _characters = new List<Character>(_characterIds.Count);            
+            var positions = teamPlacement.GetPositions(_characterIds.Count);
             int i = 0;
 
             foreach (int id in _characterIds)
@@ -40,14 +41,12 @@ namespace DarkestDungeon.Battle
 
                 var obj = GameObject.Instantiate(charLine.Prefab, positions.Current, Quaternion.identity, teamPlacement.transform);
                 var character = obj.GetComponent<Character>();
-                character.Init(++i, this, targetController, teamPlacement.DoMirror);
+                character.Init(++i, this, teamPlacement.DoMirror, battleView);
 
                 _characters.Add(character);
             }
 
-            turnController.FillCharacters(_characters);
+            return _characters;
         }
-
-        
     }
 }

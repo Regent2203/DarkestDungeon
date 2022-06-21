@@ -1,7 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 using System;
 using System.Linq;
 
@@ -25,7 +24,7 @@ namespace DarkestDungeon.Configs
             else if (results.Count() == 0)
                 Debug.LogError($"Id {id} not found in CharactersConfig. Character was not created.");
             
-            return results.Single();
+            return results.Single(); //raises exception if config is incorrect
         }
 
 

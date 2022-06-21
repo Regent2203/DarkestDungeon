@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections.Generic;
-using Spine.Unity;
 using DarkestDungeon.Battle.BattleActions;
-using DarkestDungeon.UI;
+using DarkestDungeon.Battle.BattleLoggers;
+using Spine.Unity;
 using Spine;
 using AnimationState = Spine.AnimationState;
 
@@ -13,28 +12,22 @@ namespace DarkestDungeon.Battle.Characters
     /// A basic class for any character that participates in battle.
     /// </summary>
     public class Character : MonoBehaviour
-    {
-        //frame is a sprite in child gameobject, drawn above this character, we use boxcollider2d as a rectangle to resize it
+    {        
         [SerializeField]
-        private FrameController _frameController = default;
-
+        private FrameController _frameController = default; //frame is a sprite in child gameobject, drawn above this character, we use boxcollider2d as a rectangle to resize it
         private List<BattleAction> _battleActions = new List<BattleAction>();
-        private TargetController<Character> _targetController;
+        private Team _team;
+        private BattleView _battleView;
+
         private MeshRenderer _meshRenderer;
         private SkeletonAnimation _skelAnim;
-        public Team Team { get; protected set; }
+
+        //public Parameters Parameters; //todo parameters later
+        public FrameController FrameController => _frameController;
+        public List<BattleAction> BattleActions => _battleActions;
+        public Team Team => _team;
 
 
-        //todo parameters later
-        //public Parameters Parameters { get; protected set; }
-        //int _health = 100;
-        //int _mana = 0;
-        //int _attackPower;
-        //int _armor;
-
-        //public bool IsDead => _health <= 0;
-        //public bool IsAlive => _health > 0;
-        public bool IsAlive => true; //todo, remove later
 
 
         private void Awake()
@@ -43,43 +36,30 @@ namespace DarkestDungeon.Battle.Characters
             _meshRenderer = GetComponent<MeshRenderer>();
         }
 
-        public void Init(int number, Team team, TargetController<Character> targetController, bool doMirror)
+        public void Init(int number, Team team, bool doMirror, BattleView battleView)
         {
-            name += $"_{number:00}"; //for small amounts of concatinations, StringBuilder is not better.
+            name += $"_{number:00}";
             _meshRenderer.sortingOrder += number;
 
             if (doMirror)
                 transform.localScale = Vector3.Scale(transform.localScale, new Vector3(-1, 1, 1));
 
-            Team = team;
-            _targetController = targetController;
+            _team = team;
+            _battleView = battleView;
             _frameController.PrepareFrames();
 
 
-            //todo: rework this hardcode later, into smth good and customizable in scene inspector
-            //for test task, leaving this way
-            _battleActions.Add(new BattleAction_SkipTurn("Skip turn", this));
-            _battleActions.Add(new BattleAction_Attack("Attack", this, _targetController, 20));
-        }
-        
-        public void ActivateForBattle(BattleUI battleUI, Action onActionCompleted)
-        {
-            battleUI.CreateButtonsForBattleActions(_battleActions, onActionCompleted, OnHideButtons);
-            _frameController.HighlightCurrentTurn(true);            
-            
-
-            void OnHideButtons()
-            {
-                _frameController.HighlightCurrentTurn(false);
-            }
+            //todo: rework hardcode later, into smth customizable in scene inspector
+            //fine for test task
+            _battleActions.Add(new BattleAction_SkipTurn("Skip turn", this, _battleView));
+            _battleActions.Add(new BattleAction_Attack("Attack", this, _battleView, 20));
         }
 
-        #region 'Animations-related' //todo: move?
+
+        #region 'Animations-related'
         public void PlayAnimation(string animationName, bool loop = false, float timeScale = 1.0f)
         {
             _skelAnim.ClearState();
-            //_skelAnim.AnimationName = animationName;
-            //_skelAnim.loop = loop;
             _skelAnim.timeScale = timeScale;            
             _skelAnim.AnimationState.SetAnimation(0, animationName, loop);            
         }
@@ -87,16 +67,16 @@ namespace DarkestDungeon.Battle.Characters
         public void PlayAnimation(AnimationState.TrackEntryDelegate onAnimComplete, string animationName, bool loop = false, float timeScale = 1.0f)
         {
             PlayAnimation(animationName, loop, timeScale);
-            _skelAnim.AnimationState.Complete += OnComplete;
+            _skelAnim.AnimationState.Complete += OnAnimationComplete;
 
-            void OnComplete(TrackEntry trackEntry)
+            void OnAnimationComplete(TrackEntry trackEntry)
             {
                 onAnimComplete(trackEntry);
-                _skelAnim.AnimationState.Complete -= OnComplete;
+                _skelAnim.AnimationState.Complete -= OnAnimationComplete;
             }
         }
 
-        public void PlayAnimationWithTarget(Character target, AnimationState.TrackEntryDelegate onAnimComplete, string animationName, bool loop = false, float timeScale = 1.0f)
+        public void PlayAnimation_TeleportNearTarget(Character target, AnimationState.TrackEntryDelegate onAnimComplete, string animationName, bool loop = false, float timeScale = 1.0f)
         {
             //todo: expand this method for more types of skills and animations (fine for test task)
             const float OFFSET = 4; 
@@ -112,10 +92,10 @@ namespace DarkestDungeon.Battle.Characters
             this.transform.position = newPos;
 
 
-            PlayAnimation(OnComplete, animationName, loop, timeScale);
+            PlayAnimation(OnAnimationComplete, animationName, loop, timeScale);
             
 
-            void OnComplete(TrackEntry trackEntry)
+            void OnAnimationComplete(TrackEntry trackEntry)
             {
                 onAnimComplete(trackEntry);
                 
@@ -134,7 +114,7 @@ namespace DarkestDungeon.Battle.Characters
         #region 'Mouse+Trigger related'
         private void OnMouseDown()
         {
-            _targetController.ConfirmTarget(this, onSuccess);
+            _battleView.TargetController.ConfirmTarget(this, onSuccess);
 
             void onSuccess()
             {
@@ -144,7 +124,7 @@ namespace DarkestDungeon.Battle.Characters
 
         private void OnMouseEnter()
         {
-            _targetController.CheckTarget(this, onSuccess);
+            _battleView.TargetController.CheckTarget(this, onSuccess);
 
             void onSuccess()
             {

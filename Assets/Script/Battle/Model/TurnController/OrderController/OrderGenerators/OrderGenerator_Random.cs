@@ -10,10 +10,10 @@ namespace DarkestDungeon.Battle.OrderGenerators
     /// </summary>
     public class OrderGenerator_Random : IOrderGenerator
     {
-        public Queue<int> GenerateOrder(List<Character> allCharacters)
+        public Queue<int> GenerateOrder(int objectsCount)
         {            
             var ints = new List<int>();
-            for (int i = 0; i < allCharacters.Count; i++)
+            for (int i = 0; i < objectsCount; i++)
                 ints.Add(i);
 
             var result = new Queue<int>();

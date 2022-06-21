@@ -10,10 +10,10 @@ namespace DarkestDungeon.Battle.OrderGenerators
     /// </summary>
     public class OrderGenerator_Left2Right : IOrderGenerator
     {
-        public Queue<int> GenerateOrder(List<Character> allCharacters)
+        public Queue<int> GenerateOrder(int objectsCount)
         {
             var result = new Queue<int>();
-            for (int i = 0; i < allCharacters.Count; i++)            
+            for (int i = 0; i < objectsCount; i++)
                 result.Enqueue(i);
 
             return result;

@@ -1,4 +1,5 @@
 ﻿using System;
+using DarkestDungeon.Battle.BattleLoggers;
 using DarkestDungeon.Battle.Characters;
 using Spine;
 
@@ -13,47 +14,37 @@ namespace DarkestDungeon.Battle.BattleActions
         protected int _damage; //todo
         //protected int _damage => _owner._attackPower * 2; //todo rework if we wanna use character's attackpower (dynamically updated)
 
-        private TargetController<Character> _targetController;
 
-
-        public BattleAction_Attack(string name, Character owner, TargetController<Character> targetController, int damage) : base (name, owner)
+        public BattleAction_Attack(string name, Character owner, BattleView battleView, int damage) : base (name, owner, battleView)
         {
             _damage = damage;
-            _targetController = targetController;
+            _battleView = battleView;
         }
         
         public override void OnButtonClick()
         {
-            _targetController.Prepare( (x) => _owner.Team != x.Team, StartAnimation);
+            _battleView.TargetController.Prepare( (x) => _owner.Team != x.Team, StartAnimation);
 
-
-            void StartAnimation(Character target)
+            
+            void StartAnimation(Character target) //todo in future: fix hardcoded animation name
             {
-                HideButtons();
+                Confirm();
 
-                _owner.PlayAnimationWithTarget(target, OnAnimCompleteOwner, "Miner_1"); //todo: fix hardcode (animation name)                
-                target.PlayAnimation(OnAnimCompleteTarget, "Damage", false, 0.8f); //todo: fix hardcode (animation name)
+                _owner.PlayAnimation_TeleportNearTarget(target, OnAnimCompleteOwner, "Miner_1");
+                target.PlayAnimation(OnAnimCompleteTarget, "Damage", false, 0.8f);
 
 
                 void OnAnimCompleteOwner(TrackEntry trackEntry)
                 {
-                    _owner.PlayAnimation("Idle", true); //todo: fix hardcode (animation name)
+                    _owner.PlayAnimation("Idle", true);
                     Complete();
                 }
 
                 void OnAnimCompleteTarget(TrackEntry trackEntry)
                 {
-                    target.PlayAnimation("Idle", true); //todo: fix hardcode (animation name)                    
+                    target.PlayAnimation("Idle", true);
                 }
             }
         }
-
-
-        /*
-        private void PlayIdleAnimation()
-        {
-            _owner.PlayAnimation("Idle", true);
-        }
-        */
     }
 }

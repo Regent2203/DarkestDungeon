@@ -9,6 +9,6 @@ namespace DarkestDungeon.Battle.OrderGenerators
     /// </summary>
     public interface IOrderGenerator
     {
-        Queue<int> GenerateOrder(List<Character> allCharacters);
+        Queue<int> GenerateOrder(int objectsCount);
     }
 }

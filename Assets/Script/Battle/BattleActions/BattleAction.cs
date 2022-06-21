@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using DarkestDungeon.Battle.Characters;
+using DarkestDungeon.Battle.BattleLoggers;
 
 namespace DarkestDungeon.Battle.BattleActions
 {
@@ -12,28 +12,45 @@ namespace DarkestDungeon.Battle.BattleActions
     {
         public readonly string Name;
         protected readonly Character _owner;
+        protected BattleView _battleView;
+        protected IBattleLogger _battleLogger => _battleView.BattleLogger;
 
-        public event Action OnHideButtons;
-        public event Action OnActionCompleted;
+        public event Action Confirmed;
+        public event Action Completed;
 
 
-        public BattleAction(string name, Character owner)
+        public BattleAction(string name, Character owner, BattleView battleView)
         {
             Name = name;
             _owner = owner;
+            _battleView = battleView;
         }
 
         public abstract void OnButtonClick();
 
-        protected void HideButtons()
+        protected void Confirm()
         {
-            OnHideButtons?.Invoke();
+            Confirmed?.Invoke();
         }
 
         protected void Complete()
         {
-            Debug.Log($"--{Name} completed by {_owner.name}.", _owner);
-            OnActionCompleted?.Invoke();
+            LogAction();
+            Completed?.Invoke();
+        }
+
+        public void SetListeners(Action onActionConfirmed, Action onActionCompleted)
+        {
+            Confirmed = null;
+            Completed = null;
+            
+            Confirmed += onActionConfirmed;
+            Completed += onActionCompleted;
+        }
+
+        protected virtual void LogAction()
+        {
+            _battleLogger.AddString($"--{_owner.name} performed action {Name}.");
         }
     }
 }

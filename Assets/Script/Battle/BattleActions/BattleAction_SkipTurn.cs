@@ -12,13 +12,13 @@ namespace DarkestDungeon.Battle.BattleActions
         //no parameters, nothing to do here
 
 
-        public BattleAction_SkipTurn(string name, Character owner) : base (name, owner)
+        public BattleAction_SkipTurn(string name, Character owner, BattleView battleView) : base (name, owner, battleView)
         {
         }
 
         public override void OnButtonClick()
         {
-            HideButtons();
+            Confirm();
             Complete();
         }        
     }

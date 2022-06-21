@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
 using System;
 
 namespace DarkestDungeon.Battle.Characters
